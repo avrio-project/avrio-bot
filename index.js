@@ -98,8 +98,8 @@ client.on("message", (message) => {
         }
         var dbo = db.db("tipbot-balances");
         var query = {
-            name: `${message.member.tag}`
-        };
+              name: `${message.author.id}`
+          };
         dbo.collection("users").findOne(query).then(function(err, result) {
             if (err) {
                 message.reply(`I am sorry, handling your request failed. Please try again. Error: ${err}`);
@@ -124,7 +124,7 @@ client.on("message", (message) => {
         });
     }
     if (command === "register") {
-        addUser(message.member.tag);
+        addUser(message.author.id);
         MongoClient.connect(url)
             .then(function(err, db)
         {
@@ -134,7 +134,7 @@ client.on("message", (message) => {
             }
           var dbo = db.db("tipbot-balances");
           var query = {
-              name: `${message.member.id}`
+              name: `${message.author.id}`
           };
           dbo.collection("users").findOne(query)
             .then(function(err, result) 
@@ -161,7 +161,7 @@ client.on("message", (message) => {
         }
           var dbo = db.db("tipbot-balances");
           var query = {
-              name: `${message.member.id}`
+              name: `${message.author.id}`
           };
           dbo.collection("users").findOne(query)
             .then(function(err, result) 
