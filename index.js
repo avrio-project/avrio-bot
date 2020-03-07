@@ -61,9 +61,9 @@ client.on("message", (message) => {
             const am = args[1];
             return message.reply(`${am} is not a valid ammount!`);
         }
-         if (args[1] < config.minimum_send * config.coin_units) {
+         if (args[1] < config.minimum_send / config.coin_units) {
             const am = args[1];
-             let min = config.minimum_send * config.coin_units;
+             let min = config.minimum_send / config.coin_units;
             return message.reply(`Cannot tip less than ${min} AIO!`);
         }
         if (message.author.id === message.mentions.users.id) {
@@ -71,7 +71,7 @@ client.on("message", (message) => {
         }
         const ammount = args[1];
         const taggedUser = message.mentions.users.first();
-        const result = trytip(ammount, message.mentions.users.first().id, message.author.id);
+        const result = trytip(ammount, message.mentions.users.first(), message.author);
         if (result != "failed") {
             const hash = result;
             const sender = message.author;
@@ -94,16 +94,16 @@ client.on("message", (message) => {
         MongoClient.connect(url).then(function(err, db) {
         if (err) {
             message.reply(`I am sorry, handling your request failed. Please try again. Error: ${err}`);
-            return console.log(`registering user: ${message.member.tag} gave error: ${err}`);
+            return console.log(`registering user: ${message.author} gave error: ${err}`);
         }
         var dbo = db.db("tipbot-balances");
         var query = {
-              name: `${message.author.id}`
+              name: `${message.author}`
           };
         dbo.collection("users").findOne(query).then(function(err, result) {
             if (err) {
                 message.reply(`I am sorry, handling your request failed. Please try again. Error: ${err}`);
-                return console.log(`Getting balance for user: ${message.member.tag} gave error: ${err}`);
+                return console.log(`Getting balance for user: ${message.author} gave error: ${err}`);
             }
             console.log(result.length);
             if (result.length === 0) {
@@ -116,11 +116,11 @@ client.on("message", (message) => {
              db.close();
           }).catch(function (error) {
             message.reply(`I am sorry, handling your request failed. Please try again. Error: ${err}`);
-            return console.log(`request: ${command} from user: ${message.member.tag} gave error: ${err}`);
+            return console.log(`request: ${command} from user: ${message.author} gave error: ${err}`);
         });
         }).catch(function (error) {
             message.reply(`I am sorry, handling your request failed. Please try again. Error: ${err}`);
-            return console.log(`request: ${command} from user: ${message.member.tag} gave error: ${err}`);
+            return console.log(`request: ${command} from user: ${message.author} gave error: ${err}`);
         });
     }
     if (command === "register") {
@@ -130,11 +130,11 @@ client.on("message", (message) => {
         {
           if (err) {
                 message.reply(`I am sorry, handling your request failed. Please try again. Error: ${err}`);
-                return console.log(`registering user: ${message.member.tag} gave error: ${err}`);
+                return console.log(`registering user: ${message.author} gave error: ${err}`);
             }
           var dbo = db.db("tipbot-balances");
           var query = {
-              name: `${message.author.id}`
+              name: `${message.author}`
           };
           dbo.collection("users").findOne(query)
             .then(function(err, result) 
@@ -145,11 +145,11 @@ client.on("message", (message) => {
               return message.author.send(`Registered! Your deposit address is ${address}`);
              }).catch(function (error) {
                  message.reply(`I am sorry, handling your request failed. Please try again. Error: ${err}`);
-                return console.log(`request: ${command} from user: ${message.member.tag} gave error: ${err}`);
+                return console.log(`request: ${command} from user: ${message.author} gave error: ${err}`);
              });
         }).catch(function (error) {
             message.reply(`I am sorry, handling your request failed. Please try again. Error: ${err}`);
-            return console.log(`request: ${command} from user: ${message.member.tag} gave error: ${err}`);
+            return console.log(`request: ${command} from user: ${message.author} gave error: ${err}`);
         });
      }
     if (command === "address") {
@@ -157,29 +157,29 @@ client.on("message", (message) => {
         {
           if (err) {
             message.reply(`I am sorry, handling your request failed. Please try again. Error: ${err}`);
-            return console.log(`request: ${command} from user: ${message.member.tag} gave error: ${err}`);
+            return console.log(`request: ${command} from user: ${message.author} gave error: ${err}`);
         }
           var dbo = db.db("tipbot-balances");
           var query = {
-              name: `${message.author.id}`
+              name: `${message.author}`
           };
           dbo.collection("users").findOne(query)
             .then(function(err, result) 
             {
               if (err) {
                 message.reply(`I am sorry, handling your request failed. Please try again. Error: ${err}`);
-                return console.log(`request: ${command} from user: ${message.member.tag} gave error: ${err}`);
+                return console.log(`request: ${command} from user: ${message.author} gave error: ${err}`);
               };
               let address = result['address'];
               db.close();
               return message.channel.send(`Your deposit address is ${address}`);
              }).catch(function (error) {
            message.reply(`I am sorry, handling your request failed. Please try again. Error: ${err}`);
-            return console.log(`request: ${command} from user: ${message.member.tag} gave error: ${err}`);
+            return console.log(`request: ${command} from user: ${message.author} gave error: ${err}`);
         });
       }).catch(function (error) {
             message.reply(`I am sorry, handling your request failed. Please try again. Error: ${err}`);
-            return console.log(`request: ${command} from user: ${message.member.tag} gave error: ${err}`);
+            return console.log(`request: ${command} from user: ${message.author} gave error: ${err}`);
         });
     }
     if (command === "invite") {
