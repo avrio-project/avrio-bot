@@ -22,7 +22,7 @@ function addUser(user) {
     });
 }
 
-function trytip(amount, user) {
+function trytip(amount, reciver, sender) {
     return "0x1234567890";
 }
 client.on('ready', () => {
@@ -66,12 +66,12 @@ client.on("message", (message) => {
              let min = config.minimum_send * config.coin_units;
             return message.reply(`Cannot tip less than ${min} AIO!`);
         }
-        if (message.author === message.mentions.users) {
+        if (message.author.id === message.mentions.users.id) {
             return message.reply("You can't tip yourself.");
         }
         const ammount = args[1];
-        const taggedUser = message.mentions.users.first().tag;
-        const result = trytip(ammount, taggedUser);
+        const taggedUser = message.mentions.users.first();
+        const result = trytip(ammount, message.mentions.users.first().id, message.author.id);
         if (result != "failed") {
             const hash = result;
             const sender = message.author;
@@ -92,7 +92,10 @@ client.on("message", (message) => {
     }
     if (command === "balance") {
         MongoClient.connect(url, function(err, db) {
-        if (err) throw err;
+        if (err) {
+            message.reply(`I am sorry, handling your request failed. Please try again.`);
+            return console.log(`registering user: ${message.member.tag} gave error: ${err}`);
+        }
         var dbo = db.db("tipbot-balances");
         var query = {
             name: `${message.member.tag}`
@@ -111,7 +114,13 @@ client.on("message", (message) => {
                 message.channel.send(`Your balance is ${balance} AIO`);
             }
              db.close();
-          });
+          }).catch(function (error) {
+            message.reply(`I am sorry, handling your request failed. Please try again.`);
+            return console.log(`request: ${command} from user: ${message.member.tag} gave error: ${err}`);
+        });
+        }).catch(function (error) {
+            message.reply(`I am sorry, handling your request failed. Please try again.`);
+            return console.log(`request: ${command} from user: ${message.member.tag} gave error: ${err}`);
         });
     }
     if (command === "register") {
@@ -146,7 +155,10 @@ client.on("message", (message) => {
     if (command === "address") {
         MongoClient.connect(url, function(err, db)
         {
-          if (err) throw err;
+          if (err) {
+            message.reply(`I am sorry, handling your request failed. Please try again.`);
+            return console.log(`request: ${command} from user: ${message.member.tag} gave error: ${err}`);
+        }
           var dbo = db.db("tipbot-balances");
           var query = {
               name: `${message.member.id}`
@@ -154,12 +166,21 @@ client.on("message", (message) => {
           dbo.collection("users").findOne(query)
             .then(function(err, result) 
             {
-              if (err) reject;
+              if (err) {
+                message.reply(`I am sorry, handling your request failed. Please try again.`);
+                return console.log(`request: ${command} from user: ${message.member.tag} gave error: ${err}`);
+              };
               let address = result['address'];
               db.close();
               return message.channel.send(`Your deposit address is ${address}`);
-             });
-      });
+             }).catch(function (error) {
+            message.reply(`I am sorry, handling your request failed. Please try again.`);
+            return console.log(`request: ${command} from user: ${message.member.tag} gave error: ${err}`);
+        });
+      }).catch(function (error) {
+            message.reply(`I am sorry, handling your request failed. Please try again.`);
+            return console.log(`request: ${command} from user: ${message.member.tag} gave error: ${err}`);
+        });
     }
     if (command === "invite") {
         return message.reply(`You can invite me to your discord server with ${config.invite_link}`);
