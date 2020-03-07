@@ -1,0 +1,10 @@
+{ 
+  "token"  : "your_bots_token",
+  "prefix" : "+",
+  "decimal_places" : 4,
+  "coin_units" : 10000, // 1 AIO
+  "network_fee" : 2500, // 2.5 AIO
+  "minimum_send" : 10, // 0.001 AIO,
+  "minimum_withdraw" : 1000, // 0.1 AIO
+  "bot_fee" : 2 // 2%
+}
