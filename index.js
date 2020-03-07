@@ -95,14 +95,18 @@ client.on("message", (message) => {
         if (err) throw err;
         var dbo = db.db("tipbot-balances");
         var query = {
-            name: `${user}`
+            name: `${message.member.tag}`
         };
         dbo.collection("users").find(query).toArray(function(err, result) {
-            if (err) throw err;
+            if (err) {
+                message.reply(`I am sorry, handling you'r request gave error: ${err}`);
+                return console.log(`Getting balance for user: ${message.member.tag} gave error: ${err}`);
+            }
             console.log(result.length);
             if (result.length === 0) {
                 return message.reply("You haven't registered yet! Register with ```+register```");
             } else {
+                console.log(result);
                 let balance =  result[0]['balance'];
                 message.channel.send(`Your balance is ${balance} AIO`);
             }
@@ -111,7 +115,7 @@ client.on("message", (message) => {
         });
     }
     if (command === "register") {
-        addUser(message.author);
+        addUser(message.member.tag);
         MongoClient.connect(url, function(err, db)
         {
           if (err) throw err;
