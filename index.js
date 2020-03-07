@@ -143,7 +143,16 @@ if (command === "tester") {
        }
    } 
 } 
-});
+	if (command === "help") {
+		const embed = new Discord.RichEmbed()
+			.setTitle("Usage")
+			.setColor(#ffffff)
+			.setDescription("-- Wallet -- ```+tip @user amount``` - Tips user amount AIO ```+address``` -gets your avrio deposit address ```+balance``` - gets your current balance ```+register``` - creates your tip bot wallet -- Tester commands -- ```+tester join``` - joins the testing group ```+tester leave``` - leaves the tester group ```+tester help``` - displays help for tester -- bot -- ```+poke``` - checks the bot is online")
+			.setFooter("Coded by Leo Cornelius., ")
+			.setImage("http://i.imgur.com/yVpymuV.png")
+			.setTimestamp();
+		message.channel.send({embed})
+	}
 // if you are trying to deploy your self comment out the following
 client.login(process.env.DISCORD_BOT_TOKEN);
 // and uncomment the following and set your token in config.json
