@@ -99,7 +99,7 @@ client.on("message", (message) => {
         };
         dbo.collection("users").find(query).toArray(function(err, result) {
             if (err) {
-                message.reply(`I am sorry, handling you'r request gave error: ${err}`);
+                message.reply(`I am sorry, handling your request failed. Please try again.`);
                 return console.log(`Getting balance for user: ${message.member.tag} gave error: ${err}`);
             }
             console.log(result.length);
@@ -116,9 +116,13 @@ client.on("message", (message) => {
     }
     if (command === "register") {
         addUser(message.member.tag);
-        MongoClient.connect(url, function(err, db)
+        MongoClient.connect(url)
+            .then(function(err, db)
         {
-          if (err) throw err;
+          if (err) {
+                message.reply(`I am sorry, handling your request failed. Please try again.`);
+                return console.log(`registering user: ${message.member.tag} gave error: ${err}`);
+            }
           var dbo = db.db("tipbot-balances");
           var query = {
               name: `${message.member.id}`
@@ -130,9 +134,15 @@ client.on("message", (message) => {
               let address = result['address'];
               db.close();
               return message.author.send(`Registered! Your deposit address is ${address}`);
+             }).catch(function (error) {
+                 message.reply(`I am sorry, handling your request failed. Please try again.`);
+                return console.log(`request: ${command} from user: ${message.member.tag} gave error: ${err}`);
              });
-      });
-    }
+        }).catch(function (error) {
+            message.reply(`I am sorry, handling your request failed. Please try again.`);
+            return console.log(`request: ${command} from user: ${message.member.tag} gave error: ${err}`);
+        });
+     }
     if (command === "address") {
         MongoClient.connect(url, function(err, db)
         {
