@@ -144,4 +144,7 @@ if (command === "tester") {
    } 
 } 
 });
-client.login(config.token);
+// if you are trying to deploy your self comment out the following
+client.login(process.env.DISCORD_BOT_TOKEN);
+// and uncomment the following and set your token in config.json
+// client.login(config.token);
