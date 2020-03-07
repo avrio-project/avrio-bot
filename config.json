@@ -6,5 +6,6 @@
   "network_fee" : 2500, // 2.5 AIO
   "minimum_send" : 10, // 0.001 AIO,
   "minimum_withdraw" : 1000, // 0.1 AIO
-  "bot_fee" : 2 // 2%
+  "bot_fee" : 2, // 2%
+  "invite_link" : "https://discordapp.com/oauth2/authorize?client_id=685844405927673876&scope=bot&permissions=873221200"
 }
