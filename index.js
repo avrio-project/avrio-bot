@@ -2,7 +2,7 @@ const Discord = require("discord.js");
 const client = new Discord.Client();
 const config = require("./config.json");
 var MongoClient = require('mongodb').MongoClient;
-var url = "mongodb://localhost:27017/";
+var url = process.env.MONGODB_URI;
 function addUser(user) {
       MongoClient.connect(url, function(err, db) {
   	if (err) throw err;
