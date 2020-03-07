@@ -91,7 +91,7 @@ client.on("message", (message) => {
         }
     }
     if (command === "balance") {
-        MongoClient.connect(url, function(err, db) {
+        MongoClient.connect(url).then(function(err, db) {
         if (err) {
             message.reply(`I am sorry, handling your request failed. Please try again.`);
             return console.log(`registering user: ${message.member.tag} gave error: ${err}`);
@@ -100,7 +100,7 @@ client.on("message", (message) => {
         var query = {
             name: `${message.member.tag}`
         };
-        dbo.collection("users").find(query).toArray(function(err, result) {
+        dbo.collection("users").findOne(query).then(function(err, result) {
             if (err) {
                 message.reply(`I am sorry, handling your request failed. Please try again.`);
                 return console.log(`Getting balance for user: ${message.member.tag} gave error: ${err}`);
@@ -110,7 +110,7 @@ client.on("message", (message) => {
                 return message.reply("You haven't registered yet! Register with ```+register```");
             } else {
                 console.log(result);
-                let balance =  result[0]['balance'];
+                let balance =  result['balance'];
                 message.channel.send(`Your balance is ${balance} AIO`);
             }
              db.close();
@@ -153,7 +153,7 @@ client.on("message", (message) => {
         });
      }
     if (command === "address") {
-        MongoClient.connect(url, function(err, db)
+        MongoClient.connect(url).then(function(err, db)
         {
           if (err) {
             message.reply(`I am sorry, handling your request failed. Please try again.`);
