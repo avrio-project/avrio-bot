@@ -68,14 +68,7 @@ function getBalance(user) {
 }
 
 client.on('ready', () => {
-    client.user.setStatus('available')
-    client.user.setPresence({
-        game: {
-            name: 'Try +help',
-            type: "PLAYING",
-            url: ""
-        }
-    });
+    client.user.setActivity("Try +help");
     console.log("Bot Online and listening!");
 });
 
