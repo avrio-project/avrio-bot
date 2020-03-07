@@ -2,8 +2,7 @@ const Discord = require("discord.js");
 const client = new Discord.Client();
 const config = require("./config.json");
 var MongoClient = require('mongodb').MongoClient;
-//var url = "mongodb://localhost:27017/";
-var url = process.env.MONGODB_URI;
+var url = process.env.MONGODB_URI || "mongodb://localhost:27017/";
 
 function addUser(user) {
     MongoClient.connect(url, function(err, db) {
@@ -169,7 +168,4 @@ client.on("message", (message) => {
         })
     }
 });
-// if you are trying to deploy your self comment out the following
-client.login(process.env.DISCORD_BOT_TOKEN);
-// and uncomment the following and set your token in config.json
-// client.login(config.token);
+client.login(process.env.DISCORD_BOT_TOKEN || config.token);
