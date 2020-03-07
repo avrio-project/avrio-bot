@@ -67,9 +67,9 @@ function getBalance(user) {
     return bal;
 }
 
-bot.on('ready', () => {
-    bot.user.setStatus('available')
-    bot.user.setPresence({
+client.on('ready', () => {
+    client.user.setStatus('available')
+    client.user.setPresence({
         game: {
             name: 'Try +help',
             type: "PLAYING",
