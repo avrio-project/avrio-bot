@@ -142,7 +142,7 @@ client.on("message", (message) => {
               if (err) {
                  message.reply(`I am sorry, handling your request failed. Please try again. Error: ${err}`);
                  return console.log(`registering user: ${message.author} gave error: ${err} while quering`);
-             });
+             };
               let address = result['address'];
               db.close();
               return message.author.send(`Registered! Your deposit address is ${address}`);
