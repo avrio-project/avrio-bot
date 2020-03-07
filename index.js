@@ -66,8 +66,17 @@ function getBalance(user) {
     });
     return bal;
 }
-client.on("ready", () => {
-    console.log("Bot Online");
+
+bot.on('ready', () => {
+    bot.user.setStatus('available')
+    bot.user.setPresence({
+        game: {
+            name: 'Try +help',
+            type: "PLAYING",
+            url: ""
+        }
+    });
+    console.log("Bot Online and listening!");
 });
 
 client.on("message", (message) => {
