@@ -11,70 +11,44 @@ function addUser(user) {
         var myobj = {
             name: `${user}`,
             address: "0x1234",
-            balance: 102,
+            balance: 10000,
             locked: 0
         };
         dbo.collection("users").insertOne(myobj, function(err, res) {
             if (err) throw err;
-            console.log(`1 entry inserted: ${myobj}`);
-            db.close();
-        });
-    });
-}
-
-function getAddress(user) {
-    MongoClient.connect(url, function(err, db) {
-        if (err) throw err;
-        var dbo = db.db("tipbot-balances");
-        var query = {
-            name: `${user}`
-        };
-        dbo.collection("users").find(query).toArray(function(err, result) {
-            if (err) throw err;
-            let address = result[0]['address'];
-            console.log(address);
-            return address;
-            
+            console.log(`User ${user} registered.`);
             db.close();
         });
     });
 }
 
 function trytip(amount, user) {
-    return "ok";
+    return "0x1234567890";
 }
-
-function getBalance(user) {
-    let bal = -1;
-    MongoClient.connect(url, function(err, db) {
-        if (err) throw err;
-        var dbo = db.db("tipbot-balances");
-        var query = {
-            name: `${user}`
-        };
-        dbo.collection("users").find(query).toArray(function(err, result) {
-            if (err) throw err;
-            console.log(result.length);
-            if (result.length === 0) {
-                bal = "null";
-            } else {
-                console.log(`${result[0]['balance']}`);
-                bal = result[0]['balance'];
-            }
-            db.close();
-        });
-    });
-    return bal;
-}
-
 client.on('ready', () => {
-    client.user.setActivity("Try +help");
+     client.user.setActivity(`Prefix: +, Serving ${client.guilds.size} servers`);
     console.log("Bot Online and listening!");
 });
+client.on("guildCreate", guild => {
+  // This event triggers when the bot joins a guild.
+  console.log(`New guild joined: ${guild.name} (id: ${guild.id}). This guild has ${guild.memberCount} members!`);
+  client.user.setActivity(`Prefix: +, Serving ${client.guilds.size} servers`);
+});
+
+client.on("guildDelete", guild => {
+  // this event triggers when the bot is removed from a guild.
+  console.log(`I have been removed from: ${guild.name} (id: ${guild.id})`);
+  client.user.setActivity(`Prefix: +, Serving ${client.guilds.size} servers`);
+});
+
 
 client.on("message", (message) => {
     const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
     const command = args.shift().toLowerCase();
+    if (command === "ping") {
+        const m = await message.channel.send("Ping?");
+        m.edit(`:ping_pong: Pong! Latency is ${m.createdTimestamp - message.createdTimestamp}ms. API Latency is ${Math.round(client.ping)}ms`);
+    }
     if (command === "poke") {
         message.channel.send("*slap*");
         console.log("User poked me!");
@@ -87,20 +61,22 @@ client.on("message", (message) => {
             const am = args[1];
             return message.reply(`${am} is not a valid ammount!`);
         }
-        if (message.author === message.mentions) {
-            return message.reply("Nice try, but you cant tip your self!");
+         if (args[1] < config.minimum_send * config.coin_units) {
+            const am = args[1];
+             let min = config.minimum_send * config.coin_units;
+            return message.reply(`Cannot tip less than ${min} AIO!`);
+        }
+        if (message.author === message.mentions.users) {
+            return message.reply("You can't tip yourself.");
         }
         const ammount = args[1];
-        const taggedUser = message.mentions.users.first();
-        //	message.channel.send(`Tipped ${ammount} to user: ${taggedUser.username}`);
+        const taggedUser = message.mentions.users.first().tag;
         const result = trytip(ammount, taggedUser);
-        if (result === "ok") {
-            const hash = "Err(None)";
-            const balancenew = getBalance(message.author) - ammount;
+        if (result != "failed") {
+            const hash = result;
             const sender = message.author;
-            const balancenewrec = getBalance(taggedUser) + ammount;
-            message.author.send(`Sent ${ammount} AIO to ${taggedUser}, new balance ${balancenew}`);
-            taggedUser.send(`Recived ${ammount} AIO from ${sender}. Your new balance is ${balancenewrec}`);
+            message.author.send(`Sent ${ammount} AIO to ${taggedUser}.`);
+            taggedUser.send(`Recived ${ammount} AIO from ${sender}.`);
             console.log(`User: ${message.author} sent tip to user: ${taggedUser}, ammount: ${ammount}, hash: ${hash}`);
             const embed = new Discord.RichEmbed()
                 .setTitle("Sent a tip!")
@@ -115,24 +91,66 @@ client.on("message", (message) => {
         }
     }
     if (command === "balance") {
-        const balance = getBalance(message.author);
-        console.log(`balance: ${getBalance(message.author)}`);
-        if (getBalance(message.author) === "null") {
-            return message.reply("You havent registered yet! Register with ```+register```");
-        }
-        message.channel.send(`Your balance is ${balance} AIO`);
+        MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("tipbot-balances");
+        var query = {
+            name: `${user}`
+        };
+        dbo.collection("users").find(query).toArray(function(err, result) {
+            if (err) throw err;
+            console.log(result.length);
+            if (result.length === 0) {
+                return message.reply("You haven't registered yet! Register with ```+register```");
+            } else {
+                let balance =  result[0]['balance'];
+                message.channel.send(`Your balance is ${balance} AIO`);
+            }
+             db.close();
+          });
+        });
     }
     if (command === "register") {
         addUser(message.author);
-        const address = getAddress(message.author);
-        return message.author.send(`Registered! Your deposit address is ${address}`);
+        MongoClient.connect(url, function(err, db)
+        {
+          if (err) throw err;
+          var dbo = db.db("tipbot-balances");
+          var query = {
+              name: `${message.member.id}`
+          };
+          dbo.collection("users").findOne(query)
+            .then(function(err, result) 
+            {
+              if (err) reject;
+              let address = result['address'];
+              db.close();
+              return message.author.send(`Registered! Your deposit address is ${address}`);
+             });
+      });
     }
     if (command === "address") {
-        //addUser(message.author);
-        const address = getAddress(message.author);
-        return message.author.send(`Your deposit address is ${address}`);
+        MongoClient.connect(url, function(err, db)
+        {
+          if (err) throw err;
+          var dbo = db.db("tipbot-balances");
+          var query = {
+              name: `${message.member.id}`
+          };
+          dbo.collection("users").findOne(query)
+            .then(function(err, result) 
+            {
+              if (err) reject;
+              let address = result['address'];
+              db.close();
+              return message.channel.send(`Your deposit address is ${address}`);
+             });
+      });
     }
-    if (command === "tester") {
+    if (command === "invite") {
+        return message.reply(`You can invite me to your discord server with ${config.invite_link}`);
+    }
+    if (command === "tester" && message.guild != null) { // do not allow dms
         if (args.len < 1) {
             message.reply("You need to provide at least one argument:");
             return message.channel.send("Usage: ```+tester leave, join or help```");
@@ -163,7 +181,6 @@ client.on("message", (message) => {
             .setColor("#ffffff")
             .setDescription("-- Wallet -- ```+tip @user amount``` - Tips user amount AIO ```+address``` -gets your avrio deposit address ```+balance``` - gets your current balance ```+register``` - creates your tip bot wallet -- Tester commands -- ```+tester join``` - joins the testing group ```+tester leave``` - leaves the tester group ```+tester help``` - displays help for tester -- bot -- ```+poke``` - checks the bot is online")
             .setFooter("Coded by Leo Cornelius., ")
-            .setImage("http://i.imgur.com/yVpymuV.png")
             .setTimestamp();
         message.channel.send({
             embed
