@@ -44,6 +44,7 @@ client.on("guildDelete", guild => {
 
 client.on("message", (message) => {
     const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
+    if (!message.content.startsWith('+')) return
     const command = args.shift().toLowerCase();
     if (command === "ping") {
         const m = message.channel.send("Ping?");
