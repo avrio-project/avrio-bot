@@ -79,7 +79,7 @@ client.on("message", (message) => {
             message.author.send(`Sent ${ammount} AIO to ${taggedUser}.`);
             taggedUser.send(`Recived ${ammount} AIO from ${sender}.`);
             console.log(`User: ${message.author} sent tip to user: ${taggedUser}, ammount: ${ammount}, hash: ${hash}`);
-            const embed = new Discord.RichEmbed()
+            const embed = new Discord.MessageEmbed()
                 .setTitle("Sent a tip!")
                 .setURL(`https://explore.avrio.network/src/transaction?h=${hash}`)
                 .setColor("#80ff00")
@@ -204,5 +204,6 @@ client.on("message", (message) => {
             embed
         })
     }
+
 });
 client.login(process.env.DISCORD_BOT_TOKEN || config.token);
