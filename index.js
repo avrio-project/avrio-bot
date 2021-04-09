@@ -149,7 +149,7 @@ client.on("message", (message) => {
                         message.reply(`I am sorry, handling your request failed. Please try again. Error: ${JSON.stringify(err)}`);
                         return console.log(`registering user: ${message.author} gave error: ${JSON.stringify(err)} while quering`);
                     });
-            }).catch(function(error) {
+            }).catch(function(err) {
                 message.reply(`I am sorry, handling your request failed. Please try again. Error: ${JSON.stringify(err)}`);
                 return console.log(`registering user: ${message.author} gave error: ${JSON.stringify(err)} while connecting`);
             });
