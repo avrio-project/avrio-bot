@@ -98,7 +98,8 @@ client.on("message", (message) => {
             var query = {
                 name: `${message.author}`
             };
-            dbo.collection("users").findOne(query).then(function(err, result) {
+            dbo.collection("users").find(query).toArray(function(err, documents) {
+                let result = documents[0];
                 if (err) throw err;
                 console.log(result.length);
                 if (result.length === 0) {
