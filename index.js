@@ -26,19 +26,19 @@ function trytip(amount, reciver, sender) {
     return "0x1234567890";
 }
 client.on('ready', () => {
-     client.user.setActivity(`Prefix: +, Serving ${client.guilds.size} servers`);
-    console.log("Bot Online and listening!");
+    client.user.setActivity(`Prefix: +, Serving ${client.guilds.size} servers`);
+    console.log(`Bot Online and listening! Serving ${client.guilds.size} servers`);
 });
 client.on("guildCreate", guild => {
-  // This event triggers when the bot joins a guild.
-  console.log(`New guild joined: ${guild.name} (id: ${guild.id}). This guild has ${guild.memberCount} members!`);
-  client.user.setActivity(`Prefix: +, Serving ${client.guilds.size} servers`);
+    // This event triggers when the bot joins a guild.
+    console.log(`New guild joined: ${guild.name} (id: ${guild.id}). This guild has ${guild.memberCount} members!`);
+    client.user.setActivity(`Prefix: +, Serving ${client.guilds.size} servers`);
 });
 
 client.on("guildDelete", guild => {
-  // this event triggers when the bot is removed from a guild.
-  console.log(`I have been removed from: ${guild.name} (id: ${guild.id})`);
-  client.user.setActivity(`Prefix: +, Serving ${client.guilds.size} servers`);
+    // this event triggers when the bot is removed from a guild.
+    console.log(`I have been removed from: ${guild.name} (id: ${guild.id})`);
+    client.user.setActivity(`Prefix: +, Serving ${client.guilds.size} servers`);
 });
 
 
@@ -62,7 +62,7 @@ client.on("message", (message) => {
             const am = args[1];
             return message.reply(`${am} is not a valid ammount!`);
         }
-         if (args[1] < (config.minimum_send / config.coin_units)) {
+        if (args[1] < (config.minimum_send / config.coin_units)) {
             const am = args[1];
             let min = config.minimum_send / config.coin_units;
             return message.reply(`Cannot tip less than ${min} AIO!`);
@@ -93,97 +93,93 @@ client.on("message", (message) => {
     }
     if (command === "balance") {
         MongoClient.connect(url).then(function(err, db) {
-        if (err) {
-            message.reply(`I am sorry, handling your request failed. Please try again. Error: ${err[0]}`);
-            return console.log(`geting balance for user: ${message.author} gave error: ${err} while connecting`);
-        }
-        var dbo = db.db("tipbot-balances");
-        var query = {
-              name: `${message.author}`
-          };
-        dbo.collection("users").findOne(query).then(function(err, result) {
             if (err) {
-                message.reply(`I am sorry, handling your request failed. Please try again. Error: ${err[0]}`);
-                return console.log(`getting balance for user: ${message.author} gave error: ${err} while quering`);
+                message.reply(`I am sorry, handling your request failed. Please try again. Error: ${JSON.stringify(err)}`);
+                return console.log(`geting balance for user: ${message.author} gave error: ${JSON.stringify(err)} while connecting`);
             }
-            console.log(result.length);
-            if (result.length === 0) {
-                return message.reply("You haven't registered yet! Register with ```+register```");
-            } else {
-                console.log(result);
-                let balance =  result['balance'];
-                message.channel.send(`Your balance is ${balance} AIO`);
-            }
-             db.close();
-          }).catch(function (err) {
-            message.reply(`I am sorry, handling your request failed. Please try again. Error: ${err[0]}`);
-            return console.log(`getting balance for user: ${message.author} gave error: ${err} while quering`);
-        });
-        }).catch(function (err) {
-            message.reply(`I am sorry, handling your request failed. Please try again. Error: ${err[0]}`);
-            return console.log(`getting balance for user: ${message.author} gave error: ${err} while connecting`);
+            var dbo = db.db("tipbot-balances");
+            var query = {
+                name: `${message.author}`
+            };
+            dbo.collection("users").findOne(query).then(function(err, result) {
+                if (err) {
+                    message.reply(`I am sorry, handling your request failed. Please try again. Error: ${JSON.stringify(err)}`);
+                    return console.log(`getting balance for user: ${message.author} gave error: ${JSON.stringify(err)} while quering`);
+                }
+                console.log(result.length);
+                if (result.length === 0) {
+                    return message.reply("You haven't registered yet! Register with ```+register```");
+                } else {
+                    console.log(result);
+                    let balance = result['balance'];
+                    message.channel.send(`Your balance is ${balance} AIO`);
+                }
+                db.close();
+            }).catch(function(err) {
+                message.reply(`I am sorry, handling your request failed. Please try again. Error: ${JSON.stringify(err)}`);
+                return console.log(`getting balance for user: ${message.author} gave error: ${JSON.stringify(err)} while quering`);
+            });
+        }).catch(function(err) {
+            message.reply(`I am sorry, handling your request failed. Please try again. Error: ${JSON.stringify(err)}`);
+            return console.log(`getting balance for user: ${message.author} gave error: ${JSON.stringify(err)} while connecting`);
         });
     }
     if (command === "register") {
         addUser(message.author.id);
         MongoClient.connect(url)
-            .then(function(err, db)
-        {
-          if (err) {
-                message.reply(`I am sorry, handling your request failed. Please try again. Error: ${err}`);
-                return console.log(`registering user: ${message.author} gave error: ${err} while connecting`);
-            }
-          var dbo = db.db("tipbot-balances");
-          var query = {
-              name: `${message.author}`
-          };
-          dbo.collection("users").findOne(query)
-            .then(function(err, result) 
-            {
-              if (err) {
-                 message.reply(`I am sorry, handling your request failed. Please try again. Error: ${err}`);
-                 return console.log(`registering user: ${message.author} gave error: ${err} while quering`);
-             };
-              let address = result['address'];
-              db.close();
-              return message.author.send(`Registered! Your deposit address is ${address}`);
-             }).catch(function (err) {
-                 message.reply(`I am sorry, handling your request failed. Please try again. Error: ${err}`);
-            return console.log(`registering user: ${message.author} gave error: ${err} while quering`);
-             });
-        }).catch(function (error) {
-            message.reply(`I am sorry, handling your request failed. Please try again. Error: ${err}`);
-            return console.log(`registering user: ${message.author} gave error: ${err} while connecting`);
-        });
-     }
+            .then(function(err, db) {
+                if (err) {
+                    message.reply(`I am sorry, handling your request failed. Please try again. Error: ${JSON.stringify(err)}`);
+                    return console.log(`registering user: ${message.author} gave error: ${JSON.stringify(err)} while connecting`);
+                }
+                var dbo = db.db("tipbot-balances");
+                var query = {
+                    name: `${message.author}`
+                };
+                dbo.collection("users").findOne(query)
+                    .then(function(err, result) {
+                        if (err) {
+                            message.reply(`I am sorry, handling your request failed. Please try again. Error: ${JSON.stringify(err)}`);
+                            return console.log(`registering user: ${message.author} gave error: ${JSON.stringify(err)} while quering`);
+                        };
+                        let address = result['address'];
+                        db.close();
+                        return message.author.send(`Registered! Your deposit address is ${address}`);
+                    }).catch(function(err) {
+                        message.reply(`I am sorry, handling your request failed. Please try again. Error: ${JSON.stringify(err)}`);
+                        return console.log(`registering user: ${message.author} gave error: ${JSON.stringify(err)} while quering`);
+                    });
+            }).catch(function(error) {
+                message.reply(`I am sorry, handling your request failed. Please try again. Error: ${JSON.stringify(err)}`);
+                return console.log(`registering user: ${message.author} gave error: ${JSON.stringify(err)} while connecting`);
+            });
+    }
     if (command === "address") {
-        MongoClient.connect(url).then(function(err, db)
-        {
-          if (err) {
-            message.reply(`I am sorry, handling your request failed. Please try again. Error: ${err}`);
-            return console.log(`getting address for user: ${message.author} gave error: ${err} while connecting`);
-        }
-          var dbo = db.db("tipbot-balances");
-          var query = {
-              name: `${message.author}`
-          };
-          dbo.collection("users").findOne(query)
-            .then(function(err, result) 
-            {
-              if (err) {
-                message.reply(`I am sorry, handling your request failed. Please try again. Error: ${err}`);
-            return console.log(`getting address for user: ${message.author} gave error: ${err} while quering`);
-              };
-              let address = result['address'];
-              db.close();
-              return message.channel.send(`Your deposit address is ${address}`);
-             }).catch(function (err) {
-              message.reply(`I am sorry, handling your request failed. Please try again. Error: ${err}`);
-            return console.log(`getting address for user: ${message.author} gave error: ${err} while quering`);
-        });
-      }).catch(function (err) {
-            message.reply(`I am sorry, handling your request failed. Please try again. Error: ${err}`);
-            return console.log(`getting address for user: ${message.author} gave error: ${err} while connecting`);
+        MongoClient.connect(url).then(function(err, db) {
+            if (err) {
+                message.reply(`I am sorry, handling your request failed. Please try again. Error: ${JSON.stringify(err)}`);
+                return console.log(`getting address for user: ${message.author} gave error: ${JSON.stringify(err)} while connecting`);
+            }
+            var dbo = db.db("tipbot-balances");
+            var query = {
+                name: `${message.author}`
+            };
+            dbo.collection("users").findOne(query)
+                .then(function(err, result) {
+                    if (err) {
+                        message.reply(`I am sorry, handling your request failed. Please try again. Error: ${JSON.stringify(err)}`);
+                        return console.log(`getting address for user: ${message.author} gave error: ${JSON.stringify(err)} while quering`);
+                    };
+                    let address = result['address'];
+                    db.close();
+                    return message.channel.send(`Your deposit address is ${address}`);
+                }).catch(function(err) {
+                    message.reply(`I am sorry, handling your request failed. Please try again. Error: ${JSON.stringify(err)}`);
+                    return console.log(`getting address for user: ${message.author} gave error: ${JSON.stringify(err)} while quering`);
+                });
+        }).catch(function(err) {
+            message.reply(`I am sorry, handling your request failed. Please try again. Error: ${JSON.stringify(err)}`);
+            return console.log(`getting address for user: ${message.author} gave error: ${JSON.stringify(err)} while connecting`);
         });
     }
     if (command === "invite") {

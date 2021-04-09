@@ -1,11 +1,13 @@
-{ 
-  "token"  : "your_bots_token",
-  "prefix" : "+",
-  "decimal_places" : 4,
-  "coin_units" : 10000, 
-  "network_fee" : 2500, 
-  "minimum_send" : 10, 
-  "minimum_withdraw" : 1000, 
-  "bot_fee" : 2,
-  "invite_link" : "https://discordapp.com/oauth2/authorize?client_id=685844405927673876&scope=bot&permissions=873221200"
+{
+    "token": "your_bots_token",
+    "prefix": "+",
+    "decimal_places": 4,
+    "coin_units": 10000,
+    "network_fee": 2500,
+    "minimum_send": 10,
+    "minimum_withdraw": 1000,
+    "bot_fee": 2,
+    "rpc_port": 17785,
+    "rpc_ip": "http://5.189.172.54",
+    "invite_link": "https://discordapp.com/oauth2/authorize?client_id=685844405927673876&scope=bot&permissions=873221200"
 }
