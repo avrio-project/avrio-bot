@@ -93,19 +93,13 @@ client.on("message", (message) => {
     }
     if (command === "balance") {
         MongoClient.connect(url).then(function(err, db) {
-            if (err) {
-                message.reply(`I am sorry, handling your request failed. Please try again. Error: ${JSON.stringify(err)}`);
-                return console.log(`geting balance for user: ${message.author} gave error: ${JSON.stringify(err)} while connecting`);
-            }
+            if (err) throw err;
             var dbo = db.db("tipbot-balances");
             var query = {
                 name: `${message.author}`
             };
             dbo.collection("users").findOne(query).then(function(err, result) {
-                if (err) {
-                    message.reply(`I am sorry, handling your request failed. Please try again. Error: ${JSON.stringify(err)}`);
-                    return console.log(`getting balance for user: ${message.author} gave error: ${JSON.stringify(err)} while quering`);
-                }
+                if (err) throw err;
                 console.log(result.length);
                 if (result.length === 0) {
                     return message.reply("You haven't registered yet! Register with ```+register```");
@@ -128,20 +122,14 @@ client.on("message", (message) => {
         addUser(message.author.id);
         MongoClient.connect(url)
             .then(function(err, db) {
-                if (err) {
-                    message.reply(`I am sorry, handling your request failed. Please try again. Error: ${JSON.stringify(err)}`);
-                    return console.log(`registering user: ${message.author} gave error: ${JSON.stringify(err)} while connecting`);
-                }
+                if (err) throw err;
                 var dbo = db.db("tipbot-balances");
                 var query = {
                     name: `${message.author}`
                 };
                 dbo.collection("users").findOne(query)
                     .then(function(err, result) {
-                        if (err) {
-                            message.reply(`I am sorry, handling your request failed. Please try again. Error: ${JSON.stringify(err)}`);
-                            return console.log(`registering user: ${message.author} gave error: ${JSON.stringify(err)} while quering`);
-                        };
+                        if (err) throw err;
                         let address = result['address'];
                         db.close();
                         return message.author.send(`Registered! Your deposit address is ${address}`);
@@ -156,20 +144,14 @@ client.on("message", (message) => {
     }
     if (command === "address") {
         MongoClient.connect(url).then(function(err, db) {
-            if (err) {
-                message.reply(`I am sorry, handling your request failed. Please try again. Error: ${JSON.stringify(err)}`);
-                return console.log(`getting address for user: ${message.author} gave error: ${JSON.stringify(err)} while connecting`);
-            }
+            if (err) throw err;
             var dbo = db.db("tipbot-balances");
             var query = {
                 name: `${message.author}`
             };
             dbo.collection("users").findOne(query)
                 .then(function(err, result) {
-                    if (err) {
-                        message.reply(`I am sorry, handling your request failed. Please try again. Error: ${JSON.stringify(err)}`);
-                        return console.log(`getting address for user: ${message.author} gave error: ${JSON.stringify(err)} while quering`);
-                    };
+                    if (err) throw err;
                     let address = result['address'];
                     db.close();
                     return message.channel.send(`Your deposit address is ${address}`);
